@@ -8,7 +8,7 @@ file(
   ${CMAKE_CURRENT_SOURCE_DIR}/behaviours/*.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/utils/*.h
   ${CMAKE_CURRENT_SOURCE_DIR}/utils/*.hpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/gameobjects/*.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/gameobjects*.h
   ${CMAKE_CURRENT_SOURCE_DIR}/gameobjects/*.hpp
 )
 
