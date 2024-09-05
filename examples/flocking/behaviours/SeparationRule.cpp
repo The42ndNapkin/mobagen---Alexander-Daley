@@ -21,17 +21,17 @@ Vector2f SeparationRule::computeForce(const std::vector<Boid*>& neighborhood, Bo
           float distance = sqrt((separationVector.x*separationVector.x) + (separationVector.y*separationVector.y));
           if(distance < desiredMinimalDistance) {
             //Add force inverse to distance to separation Force
-            separatingForce = separatingForce + separationVector;
+            separatingForce += separationVector/distance;
           }
         }
   //        // todo: find and apply force only on the closest mates
       }
 
   separatingForce = Vector2f::normalized(separatingForce);
-  if(separatingForce.getMagnitude() > 0.2f) {
-    separatingForce = separatingForce*0.2f;
+  if(separatingForce.getMagnitude() > 0.6f) {
+    separatingForce = separatingForce*0.6f;
   }
-  return separatingForce;
+  return separatingForce * 2.6f;
 }
 
 bool SeparationRule::drawImguiRuleExtra() {
