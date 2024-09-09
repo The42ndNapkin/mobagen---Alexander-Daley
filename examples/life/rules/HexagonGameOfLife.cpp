@@ -3,5 +3,10 @@
 //
 
 #include "HexagonGameOfLife.h"
-void HexagonGameOfLife::Step(World& world) {}
-int HexagonGameOfLife::CountNeighbors(World& world, Point2D point) { return 0; }
+void HexagonGameOfLife::Step(World& world) {
+
+}
+
+int HexagonGameOfLife::CountNeighbors(World& world, Point2D point) {
+  return 0;
+}

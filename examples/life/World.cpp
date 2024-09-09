@@ -12,7 +12,7 @@ void World::SwapBuffers() {
   currentBufferId = (currentBufferId + 1) % 2;
   for (int i = 0; i < buffer[currentBufferId].size(); i++) buffer[(currentBufferId + 1) % 2][i] = buffer[currentBufferId][i];
 }
-// todo: improve those set / get accessors
+
 void World::SetNext(Point2D point, bool value) {
   if (point.x < 0) point.x += sideSize;
   if (point.x >= sideSize) point.x %= sideSize;
@@ -23,7 +23,7 @@ void World::SetNext(Point2D point, bool value) {
   if (index >= sideSquared) index %= sideSquared;
   buffer[(currentBufferId + 1) % 2][index] = value;
 }
-// todo: improve those set / get accessors
+
 void World::SetCurrent(Point2D point, bool value) {
   if (point.x < 0) point.x += sideSize;
   if (point.x >= sideSize) point.x %= sideSize;
@@ -34,7 +34,7 @@ void World::SetCurrent(Point2D point, bool value) {
   if (index >= sideSquared) index %= sideSquared;
   buffer[currentBufferId % 2][index] = value;
 }
-// todo: improve those set / get accessors
+
 bool World::Get(Point2D point) {
   if (point.x < 0) point.x += sideSize;
   if (point.x >= sideSize) point.x %= sideSize;
