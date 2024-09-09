@@ -9,6 +9,7 @@ Vector2f BoundedAreaRule::computeForce(const std::vector<Boid*>& neighborhood, B
 
   auto winSize = this->world->engine->window->size();
 
+  //Checks the location of the boid and if it is too close to a side of the screen, applies a force in the opposite direction
   //Right side
   if(boid->getPosition().x > winSize.x - desiredDistance) {
     force.x = desiredDistance/(boid->getPosition().x-this->world->engine->window->size().x);
@@ -25,9 +26,7 @@ Vector2f BoundedAreaRule::computeForce(const std::vector<Boid*>& neighborhood, B
   if(boid->getPosition().y < desiredDistance) {
     force.y = desiredDistance/boid->getPosition().y;
   }
-  // todo: add here your code code here do make the boid follow the bounded box rule
-  // hint: use this->world->engine->window->size() and desiredDistance
-
+  //Multiplies returned force by 2.5 to ensure no boids can speed past the repelling force
   return force * 2.5f;
 }
 
