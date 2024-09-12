@@ -11,18 +11,18 @@ void JohnConway::Step(World& world) {
       if(world.Get(p)) {
         //If point has fewer than 2 live neighbors, it dies
         if(neighbors < 2) {
-          world.SetCurrent(p,false);
+          world.SetNext(p,false);
         }
         //If point has more than 3 live neighbors, it dies
         else if(neighbors > 3) {
-          world.SetCurrent(p,false);
+          world.SetNext(p,false);
         }
       }
       //if point is dead
       else {
         //If point has exactly 3 live neighbors, it comes to life
         if(neighbors == 3) {
-          world.SetCurrent(p,true);
+          world.SetNext(p,true);
         }
       }
     }
