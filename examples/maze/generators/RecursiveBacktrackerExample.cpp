@@ -34,6 +34,18 @@ std::vector<Point2D> RecursiveBacktrackerExample::getVisitables(World* w, const 
   std::vector<Point2D> visitables;
 
   // todo: implement this
+  //Get the world node at point p
+  Node basic = w->GetNode(p);
+  //Check all 4 points if they are in stack or visited, then they are not visitable
+  //Check north point
+  if (p.Up().y >= 0)
+  {
+    if (w->GetNodeColor(p.Up()) == Color::Red)
+    {
+    
+    }
+  }
+
 
   return visitables;
 }
