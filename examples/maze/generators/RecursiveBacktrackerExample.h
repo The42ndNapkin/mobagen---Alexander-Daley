@@ -11,6 +11,7 @@ private:
   std::vector<Point2D> stack;
   std::map<int, std::map<int, bool>> visited;  // naive. not optimal
   Point2D randomStartPoint(World* world);
+  int getRandomNumber();
   std::vector<Point2D> getVisitables(World* w, const Point2D& p);
 
 public:
