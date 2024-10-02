@@ -2,25 +2,28 @@
 #include "Random.h"
 #include "RecursiveBacktrackerExample.h"
 #include <climits>
+
 bool RecursiveBacktrackerExample::Step(World* w) {
     //Checks if this is the first point of the world
-  if (stack.empty() && visited.empty()) {
+  if (stack.empty() && visited[0][0] == 0) {
     stack.push_back(randomStartPoint(w));
   }
 
+  //If there's something in the stack continue moving forward, otherwise confirm the stack is done
   if (!stack.empty()) {
 
     Point2D point = stack.back();
     std::vector<Point2D> list = getVisitables(w, point);
     Node node = w->GetNode(point);
 
+    //If there are visitables nearby, pick a pseudo-random one to move forward
     if (!list.empty()) {
-      w->SetNodeColor(point, Color::Red);
 
+        w->SetNodeColor(point, Color::Red);
+      visited[point.y][point.x] = true;
       //Use random number to get next point
       Point2D next = list[getRandomNumber() % list.size()];
       stack.push_back(next);
-
       Point2D direction = next - point;
 
       //breaks down walls depending on where the next movement goes
@@ -44,7 +47,6 @@ bool RecursiveBacktrackerExample::Step(World* w) {
     }
 
   }
-
   return !stack.empty();
 }
 
@@ -69,6 +71,7 @@ Point2D RecursiveBacktrackerExample::randomStartPoint(World* world) {
   return {INT_MAX, INT_MAX};
 }
 
+//Pseudo-rng to get the next location for step function
 int RecursiveBacktrackerExample::getRandomNumber() {
   static int randomIndex = 0;
   const int randomInts[100]
@@ -89,28 +92,27 @@ std::vector<Point2D> RecursiveBacktrackerExample::getVisitables(World* w, const 
 
   //Get the world node at point p
   Node basic = w->GetNode(p);
-  //Check all 4 points if they are in stack or visited, then they are not visitable
+  //Check all 4 points: if they are in stack or visited, then they are not visitable, otherwise add it to the list of visitables
   //Check north point
-  if (p.Up().y >= -sideOver2 && w->GetNodeColor(p.Up()) != Color::Black)
+  if (p.Up().y >= -sideOver2 && visited[p.Up().y][p.Up().x] == 0 && w->GetNodeColor(p.Up()) != Color::Black)
   {
     visitables.push_back(p.Up());
   }
   //Check Right point
-  if (p.Right().x < sideOver2 && w->GetNodeColor(p.Right()) != Color::Black)
+  if (p.Right().x <= sideOver2 && visited[p.Right().y][p.Right().x] == 0 && w->GetNodeColor(p.Right()) != Color::Black)
   {
     visitables.push_back(p.Right());
   }
   //Check Down point
-  if (p.Down().y < sideOver2 && w->GetNodeColor(p.Down()) != Color::Black)
+  if (p.Down().y <= sideOver2 && visited[p.Down().y][p.Down().x] == 0 && w->GetNodeColor(p.Down()) != Color::Black)
   {
     visitables.push_back(p.Down());
   }
   //Check Left point
-  if (p.Left().x >= -sideOver2 && w->GetNodeColor(p.Left()) != Color::Black)
+  if (p.Left().x >= -sideOver2 && visited[p.Left().y][p.Left().x] == 0 && w->GetNodeColor(p.Left()) != Color::Black)
   {
     visitables.push_back(p.Left());
   }
-
 
   return visitables;
 }
