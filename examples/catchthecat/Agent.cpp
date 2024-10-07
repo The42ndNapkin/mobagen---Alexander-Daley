@@ -6,7 +6,7 @@
 using namespace std;
 std::vector<Point2D> Agent::generatePath(World* w) {
   unordered_map<Point2D, Point2D> cameFrom;  // to build the flowfield and build the path
-  queue<Point2D> frontier;                   // to store next ones to visit
+  priority_queue<Point2D> frontier;                   // to store next ones to visit
   unordered_set<Point2D> frontierSet;        // OPTIMIZATION to check faster if a point is in the queue
   unordered_map<Point2D, bool> visited;      // use .at() to get data, if the element dont exist [] will give you wrong results
 
@@ -18,11 +18,12 @@ std::vector<Point2D> Agent::generatePath(World* w) {
 
   while (!frontier.empty()) {
     // get the current from frontier
-    Point2D current = frontier.front();
+    Point2D current = frontier.top();
     if (frontierSet.contains(current))
     {
         // remove the current from frontierset
         frontierSet.erase(current);
+        frontier.pop();
     }
     // mark current as visited
     visited[current] = true;
@@ -31,7 +32,8 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     // iterate over the neighs:
     for (Point2D neighbor: neighbors) {
       if (visited[neighbor] == false) {
-      
+        frontier.push(neighbor);
+        frontierSet.insert(neighbor);
       }
     }
     // for every neighbor set the cameFrom

@@ -30,7 +30,7 @@ public:
 
   // for unordered set
   size_t operator()(const Point2D& p) const noexcept { return ((uint64_t)p.x) << 32 | (uint64_t)p.y; };
-
+  int manhattanDistance(Point2D& other) { return (abs(x - other.x) + abs(y - other.y)); };
   uint64_t hash(Point2D const& p) const noexcept { return ((uint64_t)p.x) << 32 | (uint64_t)p.y; }
 };
 

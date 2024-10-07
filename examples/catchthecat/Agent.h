@@ -5,6 +5,11 @@
 
 class World;
 
+struct AStarNode {
+  Point2D position;
+  int heuristic;
+};
+
 class Agent {
 public:
   explicit Agent() = default;
