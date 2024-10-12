@@ -6,33 +6,45 @@
 using namespace std;
 std::vector<Point2D> Agent::generatePath(World* w) {
   unordered_map<Point2D, Point2D> cameFrom;  // to build the flowfield and build the path
-  priority_queue<Point2D> frontier;                   // to store next ones to visit
+  priority_queue<AStarNode> frontier;                   // to store next ones to visit
   unordered_set<Point2D> frontierSet;        // OPTIMIZATION to check faster if a point is in the queue
   unordered_map<Point2D, bool> visited;      // use .at() to get data, if the element dont exist [] will give you wrong results
 
   // bootstrap state
-  auto catPos = w->getCat();
-  frontier.push(catPos);
-  frontierSet.insert(catPos);
+  AStarNode start = AStarNode(w->getCat());
+  start.heuristic = start.calcHeuristic(start.position, w->getWorldSideSize() / 2);
+  Point2D goal = nearestExit(w, start.position);
   Point2D borderExit = Point2D::INFINITE;  // if at the end of the loop we dont find a border, we have to return random points
 
   while (!frontier.empty()) {
     // get the current from frontier
-    Point2D current = frontier.top();
-    if (frontierSet.contains(current))
+    AStarNode current = frontier.top();
+    if (frontierSet.contains(current.position))
     {
         // remove the current from frontierset
-        frontierSet.erase(current);
+        frontierSet.erase(current.position);
         frontier.pop();
     }
+    
     // mark current as visited
-    visited[current] = true;
+    visited[current.position] = true;
+
+    if (current.position.x == w->getWorldSideSize() / 2 || current.position.x == w->getWorldSideSize() / -2
+        || current.position.y == w->getWorldSideSize() / 2 || current.position.y == w->getWorldSideSize() / -2)
+    {
+      borderExit = current.position;
+      break;
+    }
     // getVisitableNeightbors(world, current) returns a vector of neighbors that are not visited, not cat, not block, not in the queue
-    std::vector<Point2D> neighbors = getVisitableNeighbors(w, current);
+    std::vector<Point2D> neighbors = getVisitableNeighbors(w, current.position, visited,frontierSet);
     // iterate over the neighs:
     for (Point2D neighbor: neighbors) {
       if (visited[neighbor] == false) {
-        frontier.push(neighbor);
+        AStarNode neigh = AStarNode(neighbor);
+        neigh.accCost = current.accCost + 1;
+        neigh.heuristic = neigh.calcHeuristic(neigh.position, w->getWorldSideSize() / 2);
+        cameFrom[neighbor] = current.position;
+        frontier.push(neigh);
         frontierSet.insert(neighbor);
       }
     }
@@ -41,29 +53,82 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     // do this up to find a visitable border and break the loop
   }
 
+  vector<Point2D> path = {};
+  if (borderExit != Point2D::INFINITE)
+  {
+    Point2D newCurr = cameFrom[borderExit];
+    while (newCurr != start.position)
+    {
+      path.push_back(newCurr);
+      newCurr = cameFrom[newCurr];
+    }
+  }
   // if the border is not infinity, build the path from border to the cat using the camefrom map
   // if there isnt a reachable border, just return empty vector
   // if your vector is filled from the border to the cat, the first element is the catcher move, and the last element is the cat move
-  return vector<Point2D>();
+  return path;
 }
 
-std::vector<Point2D> Agent::getVisitableNeighbors(World* w, Point2D p) { 
+Point2D Agent::nearestExit(World* w, Point2D p)
+{ 
+  int halfSize = w->getWorldSideSize() / 2;
+  int yToWall = halfSize - abs(p.y);
+  int xToWall = halfSize - abs(p.x);
+  if (yToWall > xToWall && p.x > 0)
+  {
+    return Point2D(halfSize, p.y);
+  }
+  else if (yToWall > xToWall && p.x < 0)
+  {
+    return Point2D(-halfSize, p.y);
+  } 
+  else if (yToWall < xToWall && p.y > 0)
+  {
+    return Point2D(p.x, halfSize);
+  }
+  else if (yToWall < xToWall && p.y < 0)
+  {
+    return Point2D(p.x, -halfSize);
+  }
+
+  return Point2D(p.x, p.y);
+
+}
+
+std::vector<Point2D> Agent::getVisitableNeighbors(World* w, Point2D p, unordered_map<Point2D, bool> visited, unordered_set<Point2D> frontierSet) { 
     auto sideOver2 = w->getWorldSideSize() / 2;
     std::vector<Point2D> neighbors;
+    int start = p.y;
 
-    // Check all sides
-    if (p.Up().y >= sideOver2 && w->getContent(p.Up()) == false) {
-      neighbors.push_back(p.Up());
+    if (start % 2 == 0)
+    {
+      start = -1;
+    } else {
+      start = 0;
     }
-    if (p.Right().x <= sideOver2 && w->getContent(p.Right()) == false) {
-      neighbors.push_back(p.Right());
+    //Check neighbors that are visitable
+    //Top neighbors
+    for (int i = p.x + start; i < p.x + start + 2; i++)
+    {
+      Point2D temp = Point2D(i, p.y - 1);
+      if (!w->getContent(temp) && w->getCat() != temp && !visited[temp] && !frontierSet.contains(temp))
+      {
+        neighbors.push_back(temp);
+      }
     }
-    if (p.Down().y <= sideOver2 && w->getContent(p.Down()) == false) {
-      neighbors.push_back(p.Down());
+    //Middle neighbors
+    for (int i = p.x - 1; i < p.x + 2; i++) {
+      Point2D temp = Point2D(i, p.y);
+      if (!w->getContent(temp) && w->getCat() != temp && !visited[temp] && !frontierSet.contains(temp) && temp != p) {
+        neighbors.push_back(temp);
+      }
     }
-    if (p.Left().x >= sideOver2 && w->getContent(p.Left()) == false) {
-      neighbors.push_back(p.Left());
+    //Bottom neighbors
+    for (int i = p.x + start; i < p.x + start + 2; i++) {
+      Point2D temp = Point2D(i, p.y + 1);
+      if (!w->getContent(temp) && w->getCat() != temp && !visited[temp] && !frontierSet.contains(temp)) {
+        neighbors.push_back(temp);
+      }
     }
-
     return neighbors;
 }
