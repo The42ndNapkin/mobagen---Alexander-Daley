@@ -2,6 +2,7 @@
 #include "World.h"
 
 Point2D Catcher::Move(World* world) {
+    //Get the first point on the generated path, random space if no path is generated
   std::vector<Point2D> path = generatePath(world);
   if (!path.empty()) {
     return (path[0]);

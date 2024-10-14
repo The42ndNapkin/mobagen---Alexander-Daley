@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 Point2D Cat::Move(World* world) {
+    //Move to last point on the path (since it's generated backwards)  Randomly move in 6 directions if no generated path
   std::vector<Point2D> path = generatePath(world);
   if (!path.empty())
   {

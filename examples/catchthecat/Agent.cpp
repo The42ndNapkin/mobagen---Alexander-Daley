@@ -38,6 +38,9 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     // getVisitableNeightbors(world, current) returns a vector of neighbors that are not visited, not cat, not block, not in the queue
     std::vector<Point2D> neighbors = getVisitableNeighbors(w, current.position, visited,frontierSet);
     // iterate over the neighs:
+    // for every neighbor set the cameFrom
+    // enqueue the neighbors to frontier and frontierset
+    // do this up to find a visitable border and break the loop
     for (Point2D neighbor: neighbors) {
       if (visited[neighbor] == false) {
         AStarNode neigh = AStarNode(neighbor);
@@ -48,11 +51,12 @@ std::vector<Point2D> Agent::generatePath(World* w) {
         frontierSet.insert(neighbor);
       }
     }
-    // for every neighbor set the cameFrom
-    // enqueue the neighbors to frontier and frontierset
-    // do this up to find a visitable border and break the loop
+    
   }
-
+  //Build the path vector backwards using the camefrom array
+  //  if the border is not infinity, build the path from border to the cat using the camefrom map
+  //  if there isnt a reachable border, just return empty vector
+  //  if your vector is filled from the border to the cat, the first element is the catcher move, and the last element is the cat moves
   vector<Point2D> path = {};
   if (borderExit != Point2D::INFINITE)
   {
@@ -63,12 +67,11 @@ std::vector<Point2D> Agent::generatePath(World* w) {
       newCurr = cameFrom[newCurr];
     }
   }
-  // if the border is not infinity, build the path from border to the cat using the camefrom map
-  // if there isnt a reachable border, just return empty vector
-  // if your vector is filled from the border to the cat, the first element is the catcher move, and the last element is the cat move
+  
   return path;
 }
 
+//Function to get the nearest wall from a point
 Point2D Agent::nearestExit(World* w, Point2D p)
 { 
   int halfSize = w->getWorldSideSize() / 2;
@@ -95,11 +98,13 @@ Point2D Agent::nearestExit(World* w, Point2D p)
 
 }
 
+//Returns visitable neighbors
 std::vector<Point2D> Agent::getVisitableNeighbors(World* w, Point2D p, unordered_map<Point2D, bool> visited, unordered_set<Point2D> frontierSet) { 
     auto sideOver2 = w->getWorldSideSize() / 2;
     std::vector<Point2D> neighbors;
     int start = p.y;
 
+    //Edit x offset based on the hexogonal row
     if (start % 2 == 0)
     {
       start = -1;
