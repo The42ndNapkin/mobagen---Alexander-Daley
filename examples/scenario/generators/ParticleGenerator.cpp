@@ -3,6 +3,7 @@
 #include "Random.h"
 #include <iostream>
 #include <iomanip>
+
 std::vector<Color32> ParticleGenerator::Generate(int sideSize, float time) {
   // bootstrap condition
   if (sideSize != sideSizeCached) {
